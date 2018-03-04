@@ -179,8 +179,10 @@ This applies to the *inferior-lisp* buffer and the network connections."
   :group 'slime)
 
 (defcustom slime-backend "swank-loader.lisp"
-  "The name of the Lisp file that loads the Swank server.
-This name is interpreted relative to the directory containing
+  "\"ASDF\" or the path to a Lisp file that loads the Swank server.
+If it's ASDF (case-insensitive), the Lisp image is required to
+contain a working ASDF and Slime will load swank.asd.  If it's a
+file path it is interpreted relative to the directory containing
 slime.el, but could also be set to an absolute filename."
   :type 'string
   :group 'slime-lisp)
@@ -1249,10 +1251,11 @@ See `slime-start'."
     ;; Return a single form to avoid problems with buffered input.
     (format "%S\n\n"
             `(progn
-               (load ,(slime-to-lisp-filename (expand-file-name loader))
-                     :verbose t)
-               (funcall (read-from-string "swank-loader:init")
-                        :from-emacs t)
+               ,@(if (equalp "ASDF" slime-backend)
+                     `((funcall (read-from-string "asdf:load-system") :swank))
+                   `((load ,(slime-to-lisp-filename (expand-file-name loader))
+                           :verbose t)
+                     (funcall (read-from-string "swank-loader:init"))))
                (funcall (read-from-string "swank:start-server")
                         ,(slime-to-lisp-filename port-filename))))))
 

@@ -349,7 +349,7 @@ install a recent release of ASDF and in your ~~/.swank.lisp specify:
 (defmethod xref-doit ((type (eql :depends-on)) thing)
   (when (typep thing '(or string symbol))
     (loop for dependency in (who-depends-on thing)
-          for asd-file = (asdf:system-definition-pathname dependency)
+          for asd-file = (asdf:system-source-file dependency)
           when asd-file
           collect (list dependency
                         (swank/backend:make-location
@@ -444,7 +444,7 @@ already knows."
   (let* ((system (asdf:find-system name))
          (files (mapcar #'namestring
                         (cons
-                         (asdf:system-definition-pathname system)
+                         (asdf:system-source-file system)
                          (asdf-component-source-files system))))
          (main-file (find name files
                           :test #'equalp :key #'pathname-name :start 1)))
