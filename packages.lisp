@@ -200,3 +200,5 @@
            #:run-hook-with-args-until-success
            #:make-output-function-for-target
            #:make-output-stream-for-target))
+
+(declaim (special swank:*communication-style*))
